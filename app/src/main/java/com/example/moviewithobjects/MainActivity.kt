@@ -73,13 +73,21 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                Text(movie.title + " by " + movie.director + " - " + movie.genre)
+                Text(
+                    text = movie.title + " by " + movie.director + " - " + movie.genre,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
 
-                Button(onClick = {
-                    movies.remove(movie)
-                }) {
+                Button(
+                    onClick = {
+                        movies.remove(movie)
+                    }
+                ) {
                     Text("Delete")
                 }
             }
