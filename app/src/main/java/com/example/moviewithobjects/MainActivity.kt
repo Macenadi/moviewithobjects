@@ -1,5 +1,6 @@
 package com.example.moviewithobjects
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,13 +19,16 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.moviewithobjects.entities.Movie
 import com.example.moviewithobjects.ui.theme.MovieWithObjectsTheme
@@ -59,6 +63,8 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
     var director by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+
     LazyColumn(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -74,14 +80,27 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = movie.title + " by " + movie.director + " - " + movie.genre,
                     modifier = Modifier.weight(1f),
                     maxLines = 2,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
+
+                // Botão Details apenas para 2 filmes
+                if (movie.title == "Inception" || movie.title == "Titanic") {
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, DetailsActivity::class.java)
+                            intent.putExtra("movieTitle", movie.title)
+                            context.startActivity(intent)
+                        }
+                    ) {
+                        Text("Details")
+                    }
+                }
 
                 Button(
                     onClick = {
@@ -127,14 +146,16 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
                         .padding(bottom = 8.dp)
                 )
 
-                Button(onClick = {
-                    if (title.isNotBlank() && director.isNotBlank() && genre.isNotBlank()) {
-                        movies.add(Movie(title, director, genre))
-                        title = ""
-                        director = ""
-                        genre = ""
+                Button(
+                    onClick = {
+                        if (title.isNotBlank() && director.isNotBlank() && genre.isNotBlank()) {
+                            movies.add(Movie(title, director, genre))
+                            title = ""
+                            director = ""
+                            genre = ""
+                        }
                     }
-                }) {
+                ) {
                     Text("Add Movie")
                 }
             }
