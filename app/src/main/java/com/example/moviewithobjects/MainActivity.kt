@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,6 +64,12 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
     var title by remember { mutableStateOf("") }
     var director by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
+    var pressed by remember { mutableStateOf(false) }
+
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 1.1f else 1f,
+        label = "buttonScale"
+    )
 
     val context = LocalContext.current
 
@@ -89,7 +97,6 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Botão Details apenas para 2 filmes
                 if (movie.title == "Inception" || movie.title == "Titanic") {
                     Button(
                         onClick = {
@@ -147,13 +154,18 @@ fun DisplayMovieScreen(movies: SnapshotStateList<Movie>) {
                 )
 
                 Button(
+                    modifier = Modifier.scale(scale),
                     onClick = {
+                        pressed = true
+
                         if (title.isNotBlank() && director.isNotBlank() && genre.isNotBlank()) {
                             movies.add(Movie(title, director, genre))
                             title = ""
                             director = ""
                             genre = ""
                         }
+
+                        pressed = false
                     }
                 ) {
                     Text("Add Movie")
